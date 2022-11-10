@@ -3,6 +3,7 @@ const handleError = (err, req, res, next) => {
     const message = err?.message || 'Something wrong with server !';
 
     if (!message?.errCode) {
+        console.log(err);
         return res.status(status).json({
             errCode: -1,
             message
