@@ -18,7 +18,8 @@ const userSchema = new Schema({
         },
         editor: Number,
         admin: Number,
-    }
+    },
+    refreshToken: String
 }, {
     collection: 'users',
     timestamps: true
