@@ -1,5 +1,13 @@
-const env = {
+require('dotenv').config()
 
+const env = {
+    MONGO_URL: process.env.MONGO_URL
 }
 
-module.exports = env
+const ROLES_LIST = {
+    ADMIN: 5012,
+    EDITOR: 1986,
+    USER: 2001
+}
+
+module.exports = { env, ROLES_LIST }
