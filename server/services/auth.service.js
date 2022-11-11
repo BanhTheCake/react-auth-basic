@@ -83,7 +83,7 @@ const login = (data) => {
             currentUser.refreshToken = refreshToken
             await currentUser.save()
 
-            resolve([accessToken, refreshToken]);
+            resolve([accessToken, refreshToken, roles]);
         } catch (error) {
             reject(error);
         }

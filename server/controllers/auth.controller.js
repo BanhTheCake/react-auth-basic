@@ -11,7 +11,7 @@ const register = async (req, res, next) => {
 
 const login = async (req, res, next) => {
     try {
-        const [accessToken, refreshToken] = await authService.login(req.body)
+        const [accessToken, refreshToken, roles] = await authService.login(req.body)
 
         res.cookie('refreshToken', refreshToken, {
             maxAge: 1000 * 60 * 60 * 24, // 1 day
@@ -21,7 +21,10 @@ const login = async (req, res, next) => {
         return res.status(200).json({
             errCode: 0,
             message: 'Login success !',
-            accessToken
+            data: {
+                accessToken,
+                roles
+            }
         })
     } catch (error) {
         next(error)

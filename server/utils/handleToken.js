@@ -7,7 +7,18 @@ const createAccessToken = (data) => {
 };
 
 const decodeAccessToken = (token) => {
-    return jwt.verify(token, env.ACCESS_TOKEN);
+    try {
+        const data = jwt.verify(token, env.ACCESS_TOKEN);
+        return data
+    } catch (error) {
+        const err = new Error()
+        err.status = 401
+        err.message = {
+            errCode: -1,
+            message: error.message
+        }
+        throw err
+    }
 };
 
 // Refresh Token
@@ -18,7 +29,18 @@ const createRefreshToken = (data) => {
 };
 
 const decodeRefreshToken = (token) => {
-    return jwt.verify(token, env.REFRESH_TOKEN);
+    try {
+        const data = jwt.verify(token, env.REFRESH_TOKEN);
+        return data
+    } catch (error) {
+        const err = new Error()
+        err.status = 401
+        err.message = {
+            errCode: -1,
+            message: error.message
+        }
+        throw err
+    }
 };
 
 module.exports = {
