@@ -1,0 +1,46 @@
+.register {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #3498db;
+    .register-wrapper {
+        background-color: rgba(0, 0, 0, 0.25);
+        padding: 1.4em;
+        border-radius: 4px;
+        box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+        color: white;
+        .register-err {
+            background-color: rgb(244, 210, 204);
+            padding: 0.3em 0.6em;
+            color: #c23616;
+            border: thin solid #c23616;
+            border-radius: 2px;
+            margin-bottom: 0.6em;
+            width: 300px;
+        }
+        h3 {
+            font-weight: 500;
+            font-size: 1.6rem;
+            margin-bottom: 0.2em;
+        }
+    }
+}
+
+.form {
+    button {
+        margin-top: 1em;
+        outline: none;
+        border: none;
+        width: 100%;
+        padding: 0.5em 0.6em;
+        font-family: inherit;
+        font-size: 1rem;
+        border-radius: 4px;
+        background-color: #2ecc71;
+        font-weight: 500;
+        color: #ecf0f1;
+        margin-bottom: 0.6em;
+        cursor: pointer;
+    }
+}

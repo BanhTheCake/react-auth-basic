@@ -1,9 +1,12 @@
 import './App.scss';
+import Login from './layouts/Login/Login';
+import Register from './layouts/Register/Register';
 
 function App() {
   return (
     <main className="App">
-      <div>halo</div>
+      {/* <Register /> */}
+      <Login />
     </main>
   );
 }

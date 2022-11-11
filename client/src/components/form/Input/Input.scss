@@ -1,0 +1,28 @@
+.form-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.6em;
+    width: 310px;
+    label {
+        font-size: 1.1rem;
+        padding-bottom: 0.2em;
+    }
+    input {
+        outline: none;
+        border: none;
+        background-color: white;
+        display: flex;
+        padding: 0.4em 0.6em;
+        font-size: 1rem;
+        font-family: inherit;
+        border-radius: 4px;
+        width: 100%;
+    }
+    .form-err {
+        width: 100%;
+        margin-top: 0.4em;
+        background-color: rgb(240, 143, 126);
+        border-radius: 4px;
+        padding: 0.2em 0.4em;
+    }
+}
