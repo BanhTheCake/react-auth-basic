@@ -35,7 +35,7 @@ const register = (data) => {
     });
 };
 
-const login = (data) => {
+const login = (data, oldRefreshToken) => {
     return new Promise(async (resolve, reject) => {
         try {
             // Check username is exist in database
@@ -80,9 +80,24 @@ const login = (data) => {
                 username: currentUser.username,
             });
 
-            currentUser.refreshToken = refreshToken
-            await currentUser.save()
+            let newRefreshTokenArr = oldRefreshToken
+                ? currentUser.refreshToken.filter(
+                      (rt) => rt !== oldRefreshToken
+                  )
+                : currentUser.refreshToken;
 
+            if (oldRefreshToken) {
+                const foundToken = await Users.findOne({
+                    refreshToken: oldRefreshToken,
+                }).exec();
+                // That rf has been reused
+                if (!foundToken) {
+                    newRefreshTokenArr = [];
+                }
+            }
+
+            currentUser.refreshToken = [...newRefreshTokenArr, refreshToken];
+            await currentUser.save();
             resolve([accessToken, refreshToken, roles]);
         } catch (error) {
             reject(error);
@@ -103,37 +118,86 @@ const refreshToken = (refreshToken) => {
                 return reject(err);
             }
 
-            // Decode refresh token
-            const dataDecode = handleToken.decodeRefreshToken(refreshToken);
-
             // Check username is exist in database
             const currentUser = await Users.findOne({
-                username: dataDecode.username,
-                refreshToken: refreshToken
+                refreshToken,
             }).exec();
 
+            // Detected refresh token reused
             if (!currentUser) {
-                const err = new Error();
-                err.status = 401;
-                err.message = {
-                    errCode: -1,
-                    message: 'You are not authenticate !',
-                };
-                return reject(err);
+                handleToken
+                    .decodeRefreshToken(refreshToken)
+                    .then(async (decode) => {
+                        // Logout all devices
+                        const hackUser = await Users.findOne({
+                            username: decode.username,
+                        });
+                        if (hackUser) {
+                            hackUser.refreshToken = [];
+                            await hackUser.save();
+                        }
+                        const err = new Error();
+                        err.status = 401;
+                        err.message = {
+                            errCode: -1,
+                            message: 'You are not authenticate !',
+                        };
+                        return reject(err);
+                    })
+                    .catch((_) => {
+                        // Refresh token hack expired
+                        return reject(err);
+                    });
+            } else {
+                // Clear refresh token in database
+                const newRefreshTokenArr = currentUser.refreshToken.filter(
+                    (rt) => rt !== refreshToken
+                );
+
+                // Decode refresh token
+                handleToken
+                    .decodeRefreshToken(refreshToken)
+                    .then(async (decode) => {
+                        if (decode?.username !== currentUser.username) {
+                            const err = new Error();
+                            err.status = 401;
+                            err.message = {
+                                errCode: -1,
+                                message: 'You are not authenticate !',
+                            };
+                            return reject(err);
+                        }
+
+                        // Get roles
+                        const roles = [
+                            ...Object.values({ ...currentUser.roles }),
+                        ].filter((role) => role);
+
+                        // Generate new access token for user
+                        const newAccessToken = handleToken.createAccessToken({
+                            username: currentUser.username,
+                            roles,
+                        });
+
+                        const newRefreshToken = handleToken.createRefreshToken({
+                            username: currentUser.username,
+                        });
+
+                        currentUser.refreshToken = [
+                            ...newRefreshTokenArr,
+                            newRefreshToken,
+                        ];
+                        await currentUser.save();
+
+                        resolve([newAccessToken, newRefreshToken]);
+                    })
+                    .catch(async (err) => {
+                        // expired rf token
+                        currentUser.refreshToken = [...newRefreshTokenArr];
+                        await currentUser.save();
+                        return reject(err);
+                    });
             }
-
-            // Get roles
-            const roles = [...Object.values({ ...currentUser.roles })].filter(
-                (role) => role
-            );
-
-            // Generate new access token for user
-            const newAccessToken = handleToken.createAccessToken({
-                username: currentUser.username,
-                roles,
-            });
-
-            resolve([newAccessToken, roles]);
         } catch (error) {
             reject(error);
         }
@@ -141,43 +205,51 @@ const refreshToken = (refreshToken) => {
 };
 
 const handleLogout = (refreshToken) => {
-    return new Promise( async (resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         try {
-            const foundUser = await Users.findOne({ refreshToken }).exec()
+            const foundUser = await Users.findOne({ refreshToken }).exec();
             if (!foundUser) {
-                return resolve()
+                return resolve();
             }
-            foundUser.refreshToken = ''
-            await foundUser.save()
-            resolve()
+            foundUser.refreshToken = foundUser.refreshToken.filter(
+                (rt) => rt !== refreshToken
+            );
+            await foundUser.save();
+            resolve();
         } catch (error) {
-            reject(error)
+            reject(error);
         }
-    })
-}
+    });
+};
 
 const getCurrentUser = (user) => {
-    return new Promise( async (resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         try {
-            const currentUser = await Users.findOne({ username: user }).exec()
+            const currentUser = await Users.findOne({ username: user }).exec();
             if (!currentUser) {
-                const err = new Error()
-                err.status(400)
+                const err = new Error();
+                err.status(400);
                 err.message = {
                     errCode: -1,
-                    message: 'Username not exist !'
-                }
-                return reject(err)
+                    message: 'Username not exist !',
+                };
+                return reject(err);
             }
             resolve({
                 errCode: 0,
                 message: 'Ok',
-                data: currentUser
-            })
+                data: currentUser,
+            });
         } catch (error) {
-            reject(error)
+            reject(error);
         }
-    })
-}
+    });
+};
 
-module.exports = { register, login, refreshToken, handleLogout, getCurrentUser };
+module.exports = {
+    register,
+    login,
+    refreshToken,
+    handleLogout,
+    getCurrentUser,
+};

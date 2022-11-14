@@ -5,7 +5,7 @@ import useRefreshToken from './useRefreshToken';
 
 const useAxiosPrivate = () => {
     const auth = useSelector((state) => state.auth);
-    const refreshToken = useRefreshToken()
+    const refreshToken = useRefreshToken();
 
     useEffect(() => {
         const requestInterceptor = axiosPrivate.interceptors.request.use(
@@ -29,13 +29,20 @@ const useAxiosPrivate = () => {
                     err?.response.data.message === 'jwt expired' &&
                     !previousReq?.sent
                 ) {
-                    previousReq.sent = true
-                    const accessToken = await refreshToken()
-                    previousReq.headers = { ...previousReq.headers }
-                    previousReq.headers['Authorization'] = `Bearer ${accessToken}`;
-                    return axiosPrivate(previousReq)
+                    try {
+                        previousReq.sent = true;
+                        const accessToken = await refreshToken();
+                        previousReq.headers = { ...previousReq.headers };
+                        previousReq.headers[
+                            'Authorization'
+                        ] = `Bearer ${accessToken}`;
+                        return axiosPrivate(previousReq);
+                    } catch (error) {
+                        return Promise.reject(err);
+                    }
+                } else {
+                    return Promise.reject(err);
                 }
-                return Promise.reject(err);
             }
         );
 

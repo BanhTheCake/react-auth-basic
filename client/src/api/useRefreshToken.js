@@ -38,23 +38,22 @@ const useRefreshToken = (config) => {
     const { refetch: refreshToken } = useQuery(
         ['Refresh Token'],
         handleRefreshToken,
-
         // Must has staleTime and cacheTime => when error react-query will get previous token => wrong
         { enabled: false, staleTime: 0, cacheTime: 0, ...config }
     );
 
     const handleRefresh = async () => {
-        try {
-            const res = await refreshToken();
-            const accessToken = res?.data?.accessToken;
-            if (accessToken) {
-                dispatch(setAuth({ accessToken }));
-                return accessToken;
-            }
-            return null;
-        } catch (error) {
-            throw error;
+        const res = await refreshToken();
+        if (res.status === 'error') {
+            throw res.error
         }
+        const accessToken = res?.data?.accessToken;
+        if (accessToken) {
+            dispatch(setAuth({ accessToken }));
+            return accessToken;
+        }
+        console.log('resolve');
+        return null;
     };
 
     return handleRefresh;
