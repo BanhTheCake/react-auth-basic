@@ -52,8 +52,8 @@ const refreshToken = async (req, res, next) => {
         if (refreshToken) {
             res.clearCookie('refreshToken', {
                 httpOnly: true,
-                // sameSite: 'None',
-                // secure: true,
+                sameSite: 'None',
+                secure: true,
             });
         }
 
