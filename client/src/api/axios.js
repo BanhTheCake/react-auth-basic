@@ -6,3 +6,10 @@ export default axios.create({
     },
     withCredentials: 'include'
 })
+
+export const axiosPrivate = axios.create({
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    withCredentials: 'include'
+})

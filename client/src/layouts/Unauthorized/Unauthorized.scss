@@ -1,0 +1,12 @@
+.unauthorized {
+    color: white;
+    display: flex;
+    flex-direction: column;
+    .flexGrow {
+        margin-top: auto;
+    }
+    .unauthorized-btn {
+        padding: 0.4em 0.6em;
+        font-family: inherit;
+    }
+}

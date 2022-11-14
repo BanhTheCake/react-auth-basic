@@ -47,7 +47,7 @@ const login = (data) => {
                 err.status = 200;
                 err.message = {
                     errCode: -1,
-                    message: 'Username or password is incorrect !',
+                    message: 'Username or password is incorrect!',
                 };
                 return reject(err);
             }
@@ -133,7 +133,7 @@ const refreshToken = (refreshToken) => {
                 roles,
             });
 
-            resolve(newAccessToken);
+            resolve([newAccessToken, roles]);
         } catch (error) {
             reject(error);
         }
@@ -151,9 +151,33 @@ const handleLogout = (refreshToken) => {
             await foundUser.save()
             resolve()
         } catch (error) {
-            
+            reject(error)
         }
     })
 }
 
-module.exports = { register, login, refreshToken, handleLogout };
+const getCurrentUser = (user) => {
+    return new Promise( async (resolve, reject) => {
+        try {
+            const currentUser = await Users.findOne({ username: user }).exec()
+            if (!currentUser) {
+                const err = new Error()
+                err.status(400)
+                err.message = {
+                    errCode: -1,
+                    message: 'Username not exist !'
+                }
+                return reject(err)
+            }
+            resolve({
+                errCode: 0,
+                message: 'Ok',
+                data: currentUser
+            })
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
+module.exports = { register, login, refreshToken, handleLogout, getCurrentUser };

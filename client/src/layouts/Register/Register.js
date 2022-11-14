@@ -5,16 +5,25 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import useRegister from '../../api/Auth/useRegister';
 import { registerSchema } from '../../utils/validateSchema';
+import useFormPersist from 'react-hook-form-persist';
 
 const Register = () => {
     const {
         handleSubmit,
         formState: { errors },
         control,
-        clearErrors
+        clearErrors,
+        watch,
+        setValue
     } = useForm({
         resolver: yupResolver(registerSchema),
         reValidateMode: 'onSubmit', // Submit => check error (default is onChange => change => check error)
+    });
+
+    useFormPersist('storageRegister', {
+        watch,
+        setValue,
+        storage: window.localStorage,
     });
 
     const [errMsg, setErrMsg] = useState('')
@@ -35,8 +44,8 @@ const Register = () => {
     };
 
     return (
-        <section className="register">
-            <div className="register-wrapper">
+        <section className="container">
+            <div className="register">
                 { errMsg && <p className='register-err'>{errMsg}</p> }
                 <h3>Register</h3>
                 <form onSubmit={handleSubmit(onSubmit)} className="form">
