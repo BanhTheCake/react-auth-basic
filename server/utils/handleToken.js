@@ -28,19 +28,36 @@ const createRefreshToken = (data) => {
     });
 };
 
+// const decodeRefreshToken = (token) => {
+//     try {
+//         const data = jwt.verify(token, env.REFRESH_TOKEN);
+//         return data
+//     } catch (error) {
+//         const err = new Error()
+//         err.status = 401
+//         err.message = {
+//             errCode: -1,
+//             message: error.message
+//         }
+//         throw err
+//     }
+// };
+
 const decodeRefreshToken = (token) => {
-    try {
-        const data = jwt.verify(token, env.REFRESH_TOKEN);
-        return data
-    } catch (error) {
-        const err = new Error()
-        err.status = 401
-        err.message = {
-            errCode: -1,
-            message: error.message
+    return new Promise((resolve, reject) => {
+        try {
+            const data = jwt.verify(token, env.REFRESH_TOKEN);
+            resolve(data)
+        } catch (error) {
+            const err = new Error()
+            err.status = 401
+            err.message = {
+                errCode: -1,
+                message: error.message
+            }
+            reject(err)
         }
-        throw err
-    }
+    })
 };
 
 module.exports = {

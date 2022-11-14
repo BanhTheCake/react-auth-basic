@@ -18,7 +18,7 @@ const PersistLogin = () => {
     }
 
     // Get info user
-    const { isLoading: IsGetDataUser } = useGetDataUser({ onSuccess })
+    const { isFetching } = useGetDataUser({ onSuccess })
 
     // Get access token when reload
     useEffect(() => {
@@ -33,7 +33,7 @@ const PersistLogin = () => {
         !auth?.accessToken ? verifyUsers() : setIsLoading(false);
     }, []);
 
-    return (isLoading || IsGetDataUser) ? <div>Loading ... </div> : <Outlet />;
+    return (isLoading || isFetching) ? <div>Loading ... </div> : <Outlet />;
 };
 
 export default PersistLogin;

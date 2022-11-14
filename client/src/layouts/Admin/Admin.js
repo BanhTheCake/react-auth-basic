@@ -19,16 +19,8 @@ const Admin = () => {
         return navigate('/login', { state: { from: location }, replace: true  })
     };
 
-    const { data: dataEmployees } = useGetAllUsers({ select: (resData) => resData.data, onErrorAll });
+    const { data: dataEmployees } = useGetAllUsers({ select: (resData) => resData.data, onError: onErrorAll });
 
-    const onSuccess = (data) => {
-        console.log(data);
-    }
-    const onError = (err) => {
-        console.log(err);
-    }
-    const { data: dataUser } = useGetDataUser({ onSuccess, onError })
-    
     return (
         <section className="container admin">
             <h1>Admins Page</h1>
