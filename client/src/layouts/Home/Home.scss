@@ -1,0 +1,15 @@
+.home {
+    color: white;
+    display: flex;
+    flex-direction: column;
+    a {
+        color: white;
+    }
+    .flexGrow {
+        margin-top: auto;
+    }
+    button {
+        padding: 0.4em 0.6em;
+        font-family: inherit;
+    }
+}

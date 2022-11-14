@@ -22,7 +22,7 @@ app.use((req, res, next) => {
 // cross origin resource sharing
 app.use(cors({
     credentials: true,
-    origin: '*'
+    origin: 'http://localhost:3000'
 }))
 
 // Set up basic security for app 

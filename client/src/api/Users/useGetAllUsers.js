@@ -1,18 +1,21 @@
-import { useMutation } from "@tanstack/react-query";
-import { URL_AUTH_LOGIN } from "../../utils/url.variables";
-import axios from "../axios";
+import { URL_USERS } from "../../utils/url.variables";
+import { useQuery } from '@tanstack/react-query'
+import useAxiosPrivate from "../useAxiosPrivate";
 
-const useLogin = (config) => {
+const useGetAllUsers = (config) => {
 
-    const handleLogin = (data) => {
+    const axiosPrivate = useAxiosPrivate()
+
+    const handleGetAllUsers = ({ signal }) => {
         return new Promise( async (resolve, reject) => {
             try {
-                const res = await axios({
-                    method: 'post',
-                    url: URL_AUTH_LOGIN,
-                    data: data
+                const res = await axiosPrivate({
+                    method: 'get',
+                    url: URL_USERS,
+                    // To Cancel request
+                    signal
                 })
-                const resData = res?.data
+                const resData  = res?.data;
                 if (resData?.errCode !== 0) {
                     return reject(resData)
                 }
@@ -32,8 +35,8 @@ const useLogin = (config) => {
         })
     }
 
-    const ObjectMutation = useMutation(handleLogin, { ...config })
-    return ObjectMutation
-}
+    const objectQuery = useQuery(['Get All Employees'], handleGetAllUsers, {...config})
+    return objectQuery
+};
 
-export default useLogin
+export default useGetAllUsers;

@@ -5,7 +5,7 @@ const register = async (req, res, next) => {
         const resData = await authService.register(req.body)
         return res.status(200).json(resData)
     } catch (error) {
-        next(error)
+    next(error)
     }
 }
 
@@ -15,7 +15,9 @@ const login = async (req, res, next) => {
 
         res.cookie('refreshToken', refreshToken, {
             maxAge: 1000 * 60 * 60 * 24, // 1 day
-            httpOnly: true
+            httpOnly: true,
+            sameSite: 'None',
+            secure: true
         })
         
         return res.status(200).json({
@@ -23,7 +25,6 @@ const login = async (req, res, next) => {
             message: 'Login success !',
             data: {
                 accessToken,
-                roles
             }
         })
     } catch (error) {
@@ -34,11 +35,11 @@ const login = async (req, res, next) => {
 const refreshToken = async (req, res, next) => {
     try {
         const { refreshToken } = req.cookies
-        const newAccessToken = await authService.refreshToken(refreshToken)
+        const [newAccessToken, roles] = await authService.refreshToken(refreshToken)
         return res.status(200).json({
             errCode: 0,
             message: 'Ok',
-            accessToken: newAccessToken
+            accessToken: newAccessToken,
         })
     } catch (error) {
         next(error)
@@ -69,4 +70,20 @@ const logout = async (req, res, next) => {
     }
 }
 
-module.exports = { register, login, refreshToken, logout }
+const getCurrentUser = async (req, res, next) => {
+    try {
+        const user = req.user
+        if (!user) {
+            return res.status(400).json({
+                errCode: -1,
+                message: 'User is not exist '
+            })
+        }
+        const resData = await authService.getCurrentUser(user)
+        return res.status(200).json(resData)
+    } catch (error) {
+        next(error)
+    }
+}
+
+module.exports = { register, login, refreshToken, logout, getCurrentUser }

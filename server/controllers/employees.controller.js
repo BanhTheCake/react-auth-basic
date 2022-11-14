@@ -9,6 +9,8 @@ const createNewEmployee = async (req, res, next) => {
     }
 }
 
+const delay = ms => new Promise(res => setTimeout(res, ms));
+
 const getAllEmployees = async (req, res, next) => {
     try {
         const resData = await employeesService.getAllEmployees()
